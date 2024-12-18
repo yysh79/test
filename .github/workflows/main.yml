@@ -1,67 +1,69 @@
-name: CD test 
+name: CD test
+
 on:
   push:
     tags:
       - '*'
-permissions: 
+
+permissions:
   contents: read
+
 jobs:
   build:
-     runs-on: windows-latest
-     if: ${{ startsWith(github.ref, 'refs/tags/') }}
-     
-     steps:
-       - uses: actions/checkout@v4
-         with:
-           lfs: true
-           
-       - name: Install Git LFS
-         run: git lfs install
-         
-       - name: Pull lfs files
-         run: |
-            git lfs pull  
-         
-       - name: Set up Python 3.12
-         uses: actions/setup-python@v3
-         with:
-             python-version: '3.12'
-       - name: build
-         run:
-           cd ..
-           mkdir test_build
-           cd test_build
-           python -m 
-           python -m pip install --upgrade pip
-           pip install pyinstaller
-           python -m pip install -r ..\test\requirements.txt
-           pyinstaller .\test.spec
-           xcopy /E /I .\dist\testing\ ..\test
-                     
-       - name: Extract Tag Name
-         id: extract_tag_name
-         run: |
-            $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
-            Write-Host "::set-output name=tag_name::$tagName"
-       # Zip the output folder
-       - name: Zip folder
-         if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
-         run: |
+    runs-on: windows-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+          
+      - name: Install Git LFS
+        run: git lfs install
+      
+      - name: Pull LFS files
+        run: git lfs pull  
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
+      
+      - name: Build
+        run: |
+          mkdir test_build
+          cd test_build
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install -r ../test/requirements.txt
+          pyinstaller ../test.spec
+          xcopy /E /I ./dist/testing/ ../test
+          
+      - name: Extract Tag Name
+        id: extract_tag_name
+        run: |
+          $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
+          echo "tag_name=$tagName" >> $GITHUB_ENV
+
+      - name: Install 7zip
+        run: choco install 7zip
+
+      - name: Zip Folder
+        if: env.tag_name != null && env.tag_name != 'main'
+        run: |
           mkdir release
           cd release
-           7z a -mx=7 -v1500m -r release.zip ../test/
+          7z a -mx=7 -v1500m -r release.zip ../test/
           cd ..
 
-
-            
-       - name: Create Release
-         if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
-         id: upload_asset
-         uses: softprops/action-gh-release@v1
-         with:
-              files: "release/*"
-              name: ${{ steps.extract_tag_name.outputs.tag_name }}
-              tag_name: ${{ steps.extract_tag_name.outputs.tag_name }}
-              draft: false
-              prerelease: false
-           
+      - name: Create Release
+        if: env.tag_name != null && env.tag_name != 'main'
+        id: upload_asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "release/*"
+          name: ${{ env.tag_name }}
+          tag_name: ${{ env.tag_name }}
+          draft: false
+          prerelease: false
+          token: ${{ secrets.ACTION_RELEASE }}
