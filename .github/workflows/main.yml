@@ -35,9 +35,9 @@ jobs:
            python -m pip install --upgrade pip
            pip install pyinstaller
            python -m pip install -r ..\test\requirements.txt
-           pyinstaller ..\test\test.spec
+           pyinstaller .\test.spec
            xcopy /E /I .\dist\testing\ ..\test
-           cd ..\3d-tagging\
+           
            
        - name: Extract Tag Name
          id: extract_tag_name
