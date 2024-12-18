@@ -31,13 +31,15 @@ jobs:
       
       - name: Build
         run: |
+          cd ..
           mkdir test_build
           cd test_build
           python -m pip install --upgrade pip
           pip install pyinstaller
-          pip install -r ../test/requirements.txt
-          pyinstaller ../test.spec
-          xcopy /E /I ./dist/testing/ ../test
+          python -m pip install -r ..\test\requirements.txt
+          pyinstaller .\test.spec
+          xcopy /E /I .\dist\testing\ ..\test
+
           
       - name: Extract Tag Name
         id: extract_tag_name
