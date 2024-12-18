@@ -1,7 +1,7 @@
 block_cipher = None
 
 a = Analysis(
-    ['your_script.py'],  # Replace 'your_script.py' with the name of your Python script
+    ['run.py'],  # Replace 'your_script.py' with the name of your Python script
     pathex=[],
     binaries=[],
     datas=[],
