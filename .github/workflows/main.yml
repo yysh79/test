@@ -37,13 +37,23 @@ jobs:
            python -m pip install -r ..\test\requirements.txt
            pyinstaller .\test.spec
            xcopy /E /I .\dist\testing\ ..\test
-           
-           
+                     
        - name: Extract Tag Name
          id: extract_tag_name
          run: |
             $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
             Write-Host "::set-output name=tag_name::$tagName"
+       # Zip the output folder
+       - name: Zip folder
+         if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
+         run: |
+          mkdir release
+          cd release
+           7z a -mx=7 -v1500m -r release.zip ../test/
+          cd ..
+
+
+            
        - name: Create Release
          if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
          id: upload_asset
