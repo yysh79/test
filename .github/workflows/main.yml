@@ -1,0 +1,57 @@
+name: CD test 
+on:
+  push:
+    tags:
+      - '*'
+permissions: 
+  contents:read
+jobs:
+  build:
+     runs-on: windows-latest
+     if: ${{ startsWith(github.ref, 'refs/tags/') }}
+     
+     steps:
+       - uses: actins/checkout@v4
+         with:
+           lfs: true
+           
+       - name: Install Git LFS
+         run: git lfs install
+         
+       - name: Pull lfs files
+         run: |
+            git lfs pull  
+         
+       - name: Set up Python 3.12
+         uses: actions/setup-python@v3
+         with:
+             python-version: '3.12'
+       - name: build
+         run:
+           cd ..
+           mkdir test_build
+           cd test_build
+           python -m 
+           python -m pip install --upgrade pip
+           pip install pyinstaller
+           python -m pip install -r ..\test\requirements.txt
+           pyinstaller ..\test\test.spec
+           xcopy /E /I .\dist\testing\ ..\test
+           cd ..\3d-tagging\
+           
+       - name: Extract Tag Name
+         id: extract_tag_name
+         run: |
+            $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
+            Write-Host "::set-output name=tag_name::$tagName"
+       - name: Create Release
+         if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
+         id: upload_asset
+         uses: softprops/action-gh-release@v1
+         with:
+              files: "release/*"
+              name: ${{ steps.extract_tag_name.outputs.tag_name }}
+              tag_name: ${{ steps.extract_tag_name.outputs.tag_name }}
+              draft: false
+              prerelease: false
+           
