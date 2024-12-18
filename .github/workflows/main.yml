@@ -37,7 +37,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           python -m pip install -r ..\test\requirements.txt
-          pyinstaller .\test.spec
+          pyinstaller ../test/test.spec
           xcopy /E /I .\dist\testing\ ..\test
 
           
