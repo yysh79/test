@@ -43,10 +43,10 @@ jobs:
            7z a -mx=7 -v1500m -r release.zip ../tagger_gui/
           cd ..
 
-          - name: Create Release
-          id: upload_asset
-          uses: softprops/action-gh-release@v1
-          with:
+    - name: Create Release
+      id: upload_asset
+      uses: softprops/action-gh-release@v1
+      with:
             files: "release/*"
             name: ${{ steps.extract_tag_name.outputs.tag_name }}
             tag_name: ${{ steps.extract_tag_name.outputs.tag_name }}
