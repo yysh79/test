@@ -1,85 +1,39 @@
-name: CD test
+name: Build with PyInstaller
 
 on:
   push:
     tags:
-      - '*' # Trigger on any tag push
-
-permissions:
-  contents: read
+      - 'v*'  # Trigger workflow on version tags (e.g., v1.0.0)
 
 jobs:
   build:
-    runs-on: windows-latest
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
-    
+    runs-on: ubuntu-latest
+
     steps:
-      # Checkout the repository
-      - uses: actions/checkout@v4
-        with:
-          lfs: true # Enable Git LFS support
-          
-      # Install Git LFS
-      - name: Install Git LFS
-        run: git lfs install
-      
-      # Pull LFS files
-      - name: Pull LFS files
-        run: git lfs pull  
-      
-      # Set up Python 3.12
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.12'
-      
-      # Install dependencies and build with PyInstaller
-      - name: Build with PyInstaller
-        run: |
-          mkdir test_build
-          cd test_build
-          python -m pip install --upgrade pip
-          pip install pyinstaller
-          pip install -r ../requirements.txt
-          pyinstaller ../test.spec
-          
-      # Copy the output from PyInstaller
-      - name: Copy PyInstaller Output
-        run: |
-          if exist dist (
-            xcopy /E /I dist\* ..\test
-          ) else (
-            echo "Error: PyInstaller output folder does not exist!"
-            exit 1
-          )
-          
-      # Extract tag name
-      - name: Extract Tag Name
-        id: extract_tag_name
-        run: |
-          $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
-          echo "tag_name=$tagName" >> $GITHUB_ENV
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Install 7-Zip
-      - name: Install 7zip
-        run: choco install 7zip
-      
-      # Zip the `test` folder
-      - name: Zip Folder
-        if: env.tag_name != null && env.tag_name != 'main'
-        run: |
-          mkdir release
-          7z a -mx=7 -v1500m -r release.zip ./test/
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'  # Replace with the Python version you need
 
-      # Create a release and upload the artifact
-      - name: Create Release
-        if: env.tag_name != null && env.tag_name != 'main'
-        id: upload_asset
-        uses: softprops/action-gh-release@v1
-        with:
-          files: "release/*"
-          name: ${{ env.tag_name }}
-          tag_name: ${{ env.tag_name }}
-          draft: false
-          prerelease: false
-          token: ${{ secrets.ACTION_RELEASE }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Compile with PyInstaller
+      run: |
+        pyinstaller --onefile --name "${{ github.ref_name }}" run.py
+
+    - name: Create ZIP package
+      run: |
+        mkdir dist_package
+        zip -j dist_package/${{ github.ref_name }}.zip dist/${{ github.ref_name }}
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ github.ref_name }}
+        path: dist_package/${{ github.ref_name }}.zip
