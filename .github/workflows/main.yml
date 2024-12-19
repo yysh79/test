@@ -3,7 +3,7 @@ name: CD test
 on:
   push:
     tags:
-      - '*'
+      - '*' # Trigger on any tag push
 
 permissions:
   contents: read
@@ -14,51 +14,64 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
     
     steps:
+      # Checkout the repository
       - uses: actions/checkout@v4
         with:
-          lfs: true
+          lfs: true # Enable Git LFS support
           
+      # Install Git LFS
       - name: Install Git LFS
         run: git lfs install
       
+      # Pull LFS files
       - name: Pull LFS files
         run: git lfs pull  
       
+      # Set up Python 3.12
       - name: Set up Python 3.12
         uses: actions/setup-python@v3
         with:
           python-version: '3.12'
       
-      - name: Build
+      # Install dependencies and build with PyInstaller
+      - name: Build with PyInstaller
         run: |
           mkdir test_build
           cd test_build
           python -m pip install --upgrade pip
           pip install pyinstaller
-          python -m pip install -r ..\requirements.txt
+          pip install -r ../requirements.txt
           pyinstaller ../test.spec
           
-           xcopy /E /I ..\dist\test_build\ ..\test
+      # Copy the output from PyInstaller
+      - name: Copy PyInstaller Output
+        run: |
+          if exist dist (
+            xcopy /E /I dist\* ..\test
+          ) else (
+            echo "Error: PyInstaller output folder does not exist!"
+            exit 1
+          )
           
-
-          
+      # Extract tag name
       - name: Extract Tag Name
         id: extract_tag_name
         run: |
           $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
           echo "tag_name=$tagName" >> $GITHUB_ENV
 
+      # Install 7-Zip
       - name: Install 7zip
         run: choco install 7zip
-
+      
+      # Zip the `test` folder
       - name: Zip Folder
         if: env.tag_name != null && env.tag_name != 'main'
         run: |
           mkdir release
-          cd release
-          7z a -mx=7 -v1500m -r release.zip ../test/
-          cd ..
+          7z a -mx=7 -v1500m -r release.zip ./test/
 
+      # Create a release and upload the artifact
       - name: Create Release
         if: env.tag_name != null && env.tag_name != 'main'
         id: upload_asset
