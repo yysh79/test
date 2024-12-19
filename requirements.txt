@@ -1,2 +1,2 @@
-flet[all]==0.25.0
-pandas
+flet[all]==0.25.2
+
