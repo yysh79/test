@@ -40,8 +40,8 @@ jobs:
       run: |
           mkdir release
           cd release
-           7z a -mx=7 -v1500m -r release.zip ../tagger_gui/
-          cd ..
+           7z a -mx=7 -v1500m -r release.zip 
+    
 
     - name: Create Release
       id: upload_asset
