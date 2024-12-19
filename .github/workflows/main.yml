@@ -36,8 +36,7 @@ jobs:
       run:
         $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
 
-    - name: Create ZIP package
-      if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
+    - name: Create ZIP package  
       run: |
           mkdir release
           cd release
@@ -45,7 +44,6 @@ jobs:
           cd ..
 
           - name: Create Release
-          if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
           id: upload_asset
           uses: softprops/action-gh-release@v1
           with:
