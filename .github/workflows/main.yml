@@ -52,4 +52,6 @@ jobs:
             tag_name: ${{ steps.extract_tag_name.outputs.tag_name }}
             draft: false
             prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}       
             
