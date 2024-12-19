@@ -7,16 +7,16 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-
+    runs-on: windows-latest
+    
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.x'  # Replace with the Python version you need
+        python-version: '3.12'  
 
     - name: Install PyInstaller
       run: |
@@ -27,17 +27,36 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Compile with PyInstaller
+    - name: Compile the spec file
       run: |
-        pyinstaller --onefile --name "${{ github.ref_name }}" run.py
+        pyinstaller test.spec
+    
+    - name: Extract Tag Name
+      id: extract_tag_name
+      run:
+        $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
+          Write-Host "::set-output name=tag_name::$tagName"
+
+
+
 
     - name: Create ZIP package
       run: |
-        mkdir dist_package
-        zip -j dist_package/${{ github.ref_name }}.zip dist/${{ github.ref_name }}
+        if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
+        run: |
+          mkdir release
+          cd release
+           7z a -mx=7 -v1500m -r release.zip ../tagger_gui/
+          cd ..
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ github.ref_name }}
-        path: dist_package/${{ github.ref_name }}.zip
+          - name: Create Release
+          if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
+          id: upload_asset
+          uses: softprops/action-gh-release@v1
+          with:
+            files: "release/*"
+            name: ${{ steps.extract_tag_name.outputs.tag_name }}
+            tag_name: ${{ steps.extract_tag_name.outputs.tag_name }}
+            draft: false
+            prerelease: false
+            
