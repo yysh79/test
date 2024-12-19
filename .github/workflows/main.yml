@@ -40,10 +40,10 @@ jobs:
       run: |
         mkdir release
         echo "Contents of ./dist before zipping:"
-        ls ./dist  # כאן תוודא שהנתיב נכון
-        Compress-Archive -Path ./dist/* -DestinationPath ./release/release.zip  # כאן נוצר ה-ZIP
+        ls ./dist  
+        Compress-Archive -Path ./dist/* -DestinationPath ./release/release.zip  
         echo "ZIP package created at ./release/release.zip"
-        ls ./release  # בדוק שהתיקייה release מכילה את הקובץ הדחוס
+        ls ./release
       shell: pwsh
     
 
