@@ -26,7 +26,22 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
+        
+    - name: Install black
+      run: |
+        pip install black
 
+    - name: Format Python code with black (line length 120)
+      run: |
+        black --line-length 120 .
+    
+    - name: Install mypy
+      run: |
+        pip install mypy
+
+    - name: Run mypy for type checking
+      run: |
+        mypy .
     - name: Compile the spec file
       run: |
         pyinstaller test.spec
