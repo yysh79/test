@@ -1,0 +1,22 @@
+diff a/.github/workflows/main.yml b/.github/workflows/main.yml	(rejected hunks)
+@@ -7,16 +7,16 @@
+ 
+ jobs:
+   build:
+-    runs-on: ubuntu-latest
+-
++    runs-on: windows-latest
++    
+     steps:
+     - name: Checkout code
+-      uses: actions/checkout@v3
++      uses: actions/checkout@v4
+ 
+     - name: Set up Python
+       uses: actions/setup-python@v4
+       with:
+-        python-version: '3.x'  # Replace with the Python version you need
++        python-version: '3.12'  
+ 
+     - name: Install PyInstaller
+       run: |
