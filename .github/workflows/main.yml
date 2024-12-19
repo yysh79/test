@@ -35,10 +35,6 @@ jobs:
       id: extract_tag_name
       run:
         $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
-          Write-Host "::set-output name=tag_name::$tagName"
-
-
-
 
     - name: Create ZIP package
       run: |
