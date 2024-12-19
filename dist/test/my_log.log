@@ -1,0 +1,7 @@
+2024-12-19 15:31:01,549 - INFO - Assets path configured: C:\Users\yosef\Desktop\test\dist\test\assets
+2024-12-19 15:31:01,549 - INFO - Starting up TCP server on localhost:51078
+2024-12-19 15:31:01,549 - INFO - Flet app has started...
+2024-12-19 15:31:01,549 - INFO - App URL: tcp://localhost:51078
+2024-12-19 15:31:01,549 - INFO - Starting Flet View app...
+2024-12-19 15:31:01,549 - INFO - Looking for Flet executable at: C:\Users\yosef\Desktop\test\dist\test\_internal\flet_desktop\app\flet\flet.exe
+2024-12-19 15:31:01,703 - INFO - App session started
