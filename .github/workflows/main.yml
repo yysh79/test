@@ -37,9 +37,8 @@ jobs:
         $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
 
     - name: Create ZIP package
+      if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
       run: |
-        if: steps.extract_tag_name.outputs.tag_name != null && steps.extract_tag_name.outputs.tag_name != 'refs/heads/main'
-        run: |
           mkdir release
           cd release
            7z a -mx=7 -v1500m -r release.zip ../tagger_gui/
