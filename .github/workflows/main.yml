@@ -40,10 +40,10 @@ jobs:
           pyinstaller ../test/test.spec
           if exist .\dist\test_program\ (
            xcopy /E /I .\dist\test_program\ ..\test
-           ) else (
+          ) else (
              echo "Source folder does not exist!"
              exit 1
-           )
+          )
 
           
       - name: Extract Tag Name
