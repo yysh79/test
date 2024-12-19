@@ -31,19 +31,15 @@ jobs:
       
       - name: Build
         run: |
-          cd ..
           mkdir test_build
           cd test_build
           python -m pip install --upgrade pip
           pip install pyinstaller
-          python -m pip install -r ..\test\requirements.txt
-          pyinstaller ../test/test.spec
-          if exist .\dist\test_program\ (
-           xcopy /E /I .\dist\test_program\ ..\test
-          ) else (
-             echo "Source folder does not exist!"
-             exit 1
-          )
+          python -m pip install -r ..\requirements.txt
+          pyinstaller ../test.spec
+          
+           xcopy /E /I ..\dist\test_build\ ..\test
+          
 
           
       - name: Extract Tag Name
