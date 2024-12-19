@@ -38,7 +38,12 @@ jobs:
           pip install pyinstaller
           python -m pip install -r ..\test\requirements.txt
           pyinstaller ../test/test.spec
-          xcopy /E /I .\dist\testing\ ..\test
+          if exist .\dist\test_program\ (
+           xcopy /E /I .\dist\test_program\ ..\test
+           ) else (
+             echo "Source folder does not exist!"
+             exit 1
+           )
 
           
       - name: Extract Tag Name
