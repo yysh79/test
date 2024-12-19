@@ -1,7 +1,7 @@
-/test-06.txt
-test-06.txt/
-/test-01.txt
-test-01.txt/
+/build
+build/
+/dist
+dist/
 /venv
 venv/
 *.pyc
