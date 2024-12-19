@@ -36,11 +36,15 @@ jobs:
       run:
         $tagName = $Env:GITHUB_REF -replace 'refs/tags/', ''
 
-    - name: Create ZIP package  
+    - name: Create ZIP package
       run: |
-          mkdir release
-          cd release
-           zip -r release.zip 
+        mkdir release
+        echo "Contents of ./tagger_gui before zipping:"
+        ls ../tagger_gui
+        Compress-Archive -Path ../tagger_gui/* -DestinationPath ./release/release.zip
+        echo "ZIP package created at ./release/release.zip"
+        ls ./release
+      shell: pwsh
     
 
     - name: Create Release
